@@ -5,7 +5,6 @@ provider "aws" {
 
 module "ecs" {
   source = "./modules/ecs"
-  certificate_arn = var.certificate_arn
   image = var.image
 }
 

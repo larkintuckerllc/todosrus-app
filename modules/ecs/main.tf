@@ -1,3 +1,7 @@
+data "aws_acm_certificate" "this" {
+  domain   = "api.todosrus.com"
+}
+
 data "aws_vpc" "this" {
   tags = {
     Name = "development"
@@ -117,7 +121,7 @@ resource "aws_lb_target_group" "this" {
 }
 
 resource "aws_lb_listener" "this" {
-  certificate_arn    = var.certificate_arn
+  certificate_arn    = data.aws_acm_certificate.this.arn
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.this.arn

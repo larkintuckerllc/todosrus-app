@@ -12,5 +12,4 @@
 # Cogntio: User Pool: customers
 # Cognito: Identity Pool: customers
 
-variable "certificate_arn" { }
 variable "image" { }
