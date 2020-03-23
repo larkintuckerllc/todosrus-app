@@ -163,7 +163,7 @@ resource "aws_ecs_task_definition" "this" {
       },
       {
         "name": "APP_REGION",
-        "value": "us-east-1"
+        "value": "${var.aws_region_id}"
       },
       {
         "name": "APP_IDENTITY_POOL_ID",
@@ -171,7 +171,7 @@ resource "aws_ecs_task_definition" "this" {
       },
       {
         "name": "APP_ACCOUNT_ID",
-        "value": "143287522423"
+        "value": "${var.aws_caller_identity_account_id}"
       },
       {
         "name": "APP_ISSUER",
