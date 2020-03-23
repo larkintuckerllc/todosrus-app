@@ -36,7 +36,7 @@ resource "aws_iam_role_policy" "lamda_todos_create_publish_dynamodb_todos_read_s
                 "dynamodb:DescribeStream",
                 "dynamodb:GetRecords"
             ],
-            "Resource": "arn:aws:dynamodb:us-east-1:143287522423:table/${var.todos.name}/stream/*"
+            "Resource": "arn:aws:dynamodb:${var.aws_region_id}:${var.aws_caller_identity_account_id}:table/${var.todos.name}/stream/*"
         },
         {
             "Sid": "VisualEditor1",
