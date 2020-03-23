@@ -9,6 +9,7 @@ data "aws_caller_identity" "this" {}
 
 module "ecs" {
   source = "./modules/ecs"
+  todos_create_arn = aws_sns_topic.todos_create.arn
 }
 
 module "lambda_function_create_publish" {

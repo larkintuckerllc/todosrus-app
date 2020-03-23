@@ -77,7 +77,7 @@ resource "aws_iam_role_policy" "todos_r_us_ecs_custom_sns_subscribe_todos_create
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": "sns:Subscribe",
-            "Resource": "arn:aws:sns:us-east-1:143287522423:TodosCreate"
+            "Resource": "${var.todos_create_arn}"
         }
     ]
 }
