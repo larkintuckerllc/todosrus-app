@@ -40,6 +40,43 @@ resource "aws_iam_role_policy_attachment" "todosrus_ecs_amazon_ecs_task_executio
   role       = aws_iam_role.todos_r_us_ecs_execution.name
 }
 
+resource "aws_iam_role" "todos_r_us_ecs_custom" {
+  assume_role_policy = <<EOF
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+  name               = "TodosRUsECSCustom"
+}
+
+resource "aws_iam_role_policy" "todos_r_us_ecs_custom_sns_subscribe_todos_create" {
+    name   = "SNSSubscribeTodosCreate"
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "sns:Subscribe",
+            "Resource": "arn:aws:sns:us-east-1:143287522423:TodosCreate"
+        }
+    ]
+}
+EOF
+    role   = aws_iam_role.todos_r_us_ecs_custom.id
+}
+
 resource "aws_security_group" "this" {
   egress {
     cidr_blocks = ["0.0.0.0/0"]
@@ -167,7 +204,7 @@ EOF
     memory                   = 512
     network_mode             = "awsvpc"
     requires_compatibilities = ["FARGATE"]
-    task_role_arn            = var.task_role_arn
+    task_role_arn            = aws_iam_role.todos_r_us_ecs_custom.arn
 }
 
 resource "aws_ecs_service" "this" {

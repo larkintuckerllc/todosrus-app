@@ -7,7 +7,6 @@ module "ecs" {
   source = "./modules/ecs"
   certificate_arn = var.certificate_arn
   image = var.image
-  task_role_arn = var.task_role_arn
 }
 
 module "lambda_function_create_publish" {
