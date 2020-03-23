@@ -167,7 +167,7 @@ resource "aws_ecs_task_definition" "this" {
       },
       {
         "name": "APP_IDENTITY_POOL_ID",
-        "value": "us-east-1:a95300b5-5fba-473d-bc2c-471ca5723910"
+        "value": "${var.identity_pool_id}"
       },
       {
         "name": "APP_ACCOUNT_ID",
