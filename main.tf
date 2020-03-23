@@ -15,6 +15,7 @@ module "ecs" {
   identity_pool_id = var.identity_pool_id
   identity_provider_name = var.identity_provider_name
   issuer = var.issuer
+  jwks = var.jwks
   todos_create_arn = aws_sns_topic.todos_create.arn
 }
 
