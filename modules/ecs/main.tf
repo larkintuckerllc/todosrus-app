@@ -20,6 +20,10 @@ data "aws_iam_policy" "amazon_ecs_task_execution_policy" {
   arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+data "aws_ecr_repository" "this" {
+  name = "todosrus"
+}
+
 resource "aws_iam_role" "todos_r_us_ecs_execution" {
   assume_role_policy = <<EOF
 {
@@ -187,7 +191,7 @@ resource "aws_ecs_task_definition" "this" {
       }
     ],
     "essential": true,
-    "image": "${var.image}",
+    "image": "${data.aws_ecr_repository.this.repository_url}",
     "memory": 512,
     "mountPoints": [],
     "name": "todosrus",

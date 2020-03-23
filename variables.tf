@@ -11,5 +11,3 @@
 # CodePipeline: frontend
 # Cogntio: User Pool: customers
 # Cognito: Identity Pool: customers
-
-variable "image" { }

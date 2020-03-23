@@ -5,7 +5,6 @@ provider "aws" {
 
 module "ecs" {
   source = "./modules/ecs"
-  image = var.image
 }
 
 module "lambda_function_create_publish" {
