@@ -187,7 +187,7 @@ resource "aws_ecs_task_definition" "this" {
       },
       {
         "name": "APP_TOPIC_ARN",
-        "value": "arn:aws:sns:us-east-1:143287522423:TodosCreate"
+        "value": "${var.todos_create_arn}"
       }
     ],
     "essential": true,
