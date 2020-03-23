@@ -175,15 +175,15 @@ resource "aws_ecs_task_definition" "this" {
       },
       {
         "name": "APP_ISSUER",
-        "value": "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_rIytU4eSc"
+        "value": "${var.issuer}"
       },
       {
         "name": "APP_IDENTITY_PROVIDER_NAME",
-        "value": "cognito-idp.us-east-1.amazonaws.com/us-east-1_rIytU4eSc"
+        "value": "${var.identity_provider_name}"
       },
       {
         "name": "APP_AUDIENCE",
-        "value": "3mvlgjo1u6idlujdatvk83698p"
+        "value": "${var.audience}"
       },
       {
         "name": "APP_TOPIC_ARN",

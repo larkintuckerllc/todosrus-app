@@ -9,9 +9,12 @@ data "aws_caller_identity" "this" {}
 
 module "ecs" {
   source = "./modules/ecs"
+  audience = var.audience
   aws_region_id = data.aws_region.this.id
   aws_caller_identity_account_id = data.aws_caller_identity.this.account_id
   identity_pool_id = var.identity_pool_id
+  identity_provider_name = var.identity_provider_name
+  issuer = var.issuer
   todos_create_arn = aws_sns_topic.todos_create.arn
 }
 
