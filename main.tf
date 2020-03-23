@@ -6,7 +6,6 @@ provider "aws" {
 module "ecs" {
   source = "./modules/ecs"
   certificate_arn = var.certificate_arn
-  execution_role_arn = var.execution_role_arn
   image = var.image
   task_role_arn = var.task_role_arn
 }
