@@ -5,4 +5,5 @@ variable "identity_pool_id" { }
 variable "identity_provider_name" { }
 variable "issuer" { }
 variable "jwks" { }
+variable "task_change_flag" { }
 variable "todos_create_arn" { }

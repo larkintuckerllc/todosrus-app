@@ -24,6 +24,17 @@ data "aws_ecr_repository" "this" {
   name = "todosrus"
 }
 
+# CHICKEN AND EGG SITUATION; REMOVE IF FIRST RUN
+data "aws_ecs_cluster" "this" {
+  cluster_name = "todosrus"
+}
+
+# CHICKEN AND EGG SITUATION; REMOVE IF FIRST RUN
+data "aws_ecs_service" "this" {
+  service_name = "todosrus"
+  cluster_arn  = data.aws_ecs_cluster.this.arn
+}
+
 resource "aws_iam_role" "todos_r_us_ecs_execution" {
   assume_role_policy = <<EOF
 {
@@ -231,5 +242,5 @@ resource "aws_ecs_service" "this" {
       security_groups     = [aws_security_group.this.id]
       subnets             = data.aws_subnet_ids.this.ids
     }
-    task_definition       = aws_ecs_task_definition.this.arn
+    task_definition       = var.task_change_flag ? aws_ecs_task_definition.this.arn : data.aws_ecs_service.this.task_definition
 }

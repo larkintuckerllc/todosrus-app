@@ -18,3 +18,6 @@ variable "audience" { }
 variable "identity_provider_name" { }
 variable "issuer" { }
 variable "jwks" { }
+variable "task_change_flag" {
+  default = false
+}
