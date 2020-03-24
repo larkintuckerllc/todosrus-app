@@ -69,7 +69,7 @@ EOF
 }
 
 resource "aws_lambda_function" "todos_create_publish" {
-    environment {
+  environment {
     variables = {
       APP_TOPIC_ARN = var.todos_create_arn
     }
