@@ -81,8 +81,17 @@ resource "aws_lambda_function" "todos_create_publish" {
   runtime          = "python3.8"
 }
 
+resource "aws_lambda_alias" "todos_create_publish_development" {
+  function_name    = aws_lambda_function.todos_create_publish.arn
+  function_version = "$LATEST"
+  lifecycle {
+    ignore_changes = [function_version]
+  }
+  name             = "development"
+}
+
 resource "aws_lambda_event_source_mapping" "todos_create_publish_event_dynamodb" {
   event_source_arn  = var.todos.stream_arn
-  function_name     = aws_lambda_function.todos_create_publish.arn
+  function_name     = aws_lambda_alias.todos_create_publish_development.arn
   starting_position = "LATEST"
 }
