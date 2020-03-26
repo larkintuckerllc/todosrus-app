@@ -1,0 +1,12 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - curl https://releases.hashicorp.com/terraform/0.12.21/terraform_0.12.21_linux_amd64.zip > install.zip
+      - unzip install.zip
+      - sh scripts/create-config.sh
+      - ./terraform init
+  build:
+    commands:
+      - ./terraform apply -auto-approve
