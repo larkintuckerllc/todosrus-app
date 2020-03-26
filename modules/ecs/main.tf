@@ -2,14 +2,8 @@ data "aws_acm_certificate" "this" {
   domain   = "api.todosrus.com"
 }
 
-data "aws_vpc" "this" {
-  tags = {
-    Name = "development"
-  }
-}
-
 data "aws_subnet_ids" "this" {
-  vpc_id = data.aws_vpc.this.id
+  vpc_id = var.vpc_id
 }
 
 data "aws_route53_zone" "this" {
@@ -115,7 +109,7 @@ resource "aws_security_group" "this" {
     protocol    = "tcp"
     to_port     = 443
   }
-  vpc_id      = data.aws_vpc.this.id
+  vpc_id      = var.vpc_id
 }
 
 resource "aws_lb" "this" {
@@ -132,7 +126,7 @@ resource "aws_lb_target_group" "this" {
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
-  vpc_id      = data.aws_vpc.this.id
+  vpc_id      = var.vpc_id
 }
 
 resource "aws_lb_listener" "this" {

@@ -1,3 +1,22 @@
+terraform {
+  backend "remote" {
+    organization = "todosrus"
+    workspaces {
+      name = "todosrus-app"
+    }
+  }
+}
+
+data "terraform_remote_state" "net" {
+  backend = "remote"
+  config = {
+    organization = "todosrus"
+    workspaces = {
+      name = "todosrus-net"
+    }
+  }
+}
+
 provider "aws" {
   version = "~> 2.0"
   region  = "us-east-1"
@@ -18,6 +37,7 @@ module "ecs" {
   jwks = var.jwks
   task_change_flag = var.task_change_flag
   todos_create_arn = aws_sns_topic.todos_create.arn
+  vpc_id = data.terraform_remote_state.net.outputs.vpc_id
 }
 
 module "lambda_function_create_publish" {

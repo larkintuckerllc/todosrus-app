@@ -7,3 +7,4 @@ variable "issuer" { }
 variable "jwks" { }
 variable "task_change_flag" { }
 variable "todos_create_arn" { }
+variable "vpc_id" { }
