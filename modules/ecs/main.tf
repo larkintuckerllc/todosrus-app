@@ -2,8 +2,18 @@ data "aws_acm_certificate" "this" {
   domain   = "api.todosrus.com"
 }
 
-data "aws_subnet_ids" "this" {
+data "aws_subnet_ids" "public" {
   vpc_id = var.vpc_id
+  tags = {
+    Tier = "Public"
+  }
+}
+
+data "aws_subnet_ids" "private" {
+  vpc_id = var.vpc_id
+  tags = {
+    Tier = "Private"
+  }
 }
 
 data "aws_route53_zone" "this" {
@@ -116,7 +126,7 @@ resource "aws_lb" "this" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.this.id]
-  subnets            = data.aws_subnet_ids.this.ids
+  subnets            = data.aws_subnet_ids.public.ids
 }
 
 resource "aws_lb_target_group" "this" {
@@ -234,7 +244,7 @@ resource "aws_ecs_service" "this" {
     network_configuration {
       assign_public_ip    = true
       security_groups     = [aws_security_group.this.id]
-      subnets             = data.aws_subnet_ids.this.ids
+      subnets             = data.aws_subnet_ids.private.ids
     }
     task_definition       = var.task_change_flag ? aws_ecs_task_definition.this.arn : data.aws_ecs_service.this.task_definition
 }
