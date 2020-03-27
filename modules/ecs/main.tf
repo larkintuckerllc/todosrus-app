@@ -1,5 +1,5 @@
 data "aws_acm_certificate" "this" {
-  domain   = "api.todosrus.com"
+  domain  = "api.todosrus.com"
 }
 
 data "aws_subnet_ids" "public" {
@@ -100,32 +100,54 @@ EOF
     role   = aws_iam_role.todos_r_us_ecs_custom.id
 }
 
-resource "aws_security_group" "this" {
-  egress {
-    cidr_blocks = ["0.0.0.0/0"]
-    from_port   = 0
-    protocol    = "-1"
-    to_port     = 0
-  }
-  ingress {
-    cidr_blocks = ["0.0.0.0/0"]
-    from_port   = 80 
-    protocol    = "tcp"
-    to_port     = 80 
-  }
-  ingress {
-    cidr_blocks = ["0.0.0.0/0"]
-    from_port   = 443 
-    protocol    = "tcp"
-    to_port     = 443
-  }
+resource "aws_security_group" "lb" {
   vpc_id      = var.vpc_id
+}
+
+resource "aws_security_group" "web" {
+  vpc_id      = var.vpc_id
+}
+
+resource "aws_security_group_rule" "lb_ingress" {
+  type        = "ingress"
+  cidr_blocks = ["0.0.0.0/0"]
+  from_port   = 443
+  protocol    = "tcp"
+  to_port     = 443
+  security_group_id = aws_security_group.lb.id
+}
+
+resource "aws_security_group_rule" "lb_egress" {
+  type        = "egress"
+  source_security_group_id = aws_security_group.web.id
+  from_port   = 80
+  protocol    = "tcp"
+  to_port     = 80
+  security_group_id = aws_security_group.lb.id
+}
+
+resource "aws_security_group_rule" "web_egress" {
+  type        = "egress"
+  cidr_blocks = ["0.0.0.0/0"]
+  from_port   = 0
+  protocol    = "-1"
+  to_port     = 0
+  security_group_id = aws_security_group.web.id
+}
+
+resource "aws_security_group_rule" "web_lb" {
+  type        = "ingress"
+  source_security_group_id = aws_security_group.lb.id
+  from_port   = 80
+  protocol    = "tcp"
+  to_port     = 80
+  security_group_id = aws_security_group.web.id
 }
 
 resource "aws_lb" "this" {
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.this.id]
+  security_groups    = [aws_security_group.lb.id]
   subnets            = data.aws_subnet_ids.public.ids
 }
 
@@ -243,7 +265,7 @@ resource "aws_ecs_service" "this" {
     name                  = "todosrus"
     network_configuration {
       assign_public_ip    = true
-      security_groups     = [aws_security_group.this.id]
+      security_groups     = [aws_security_group.web.id]
       subnets             = data.aws_subnet_ids.private.ids
     }
     task_definition       = var.task_change_flag ? aws_ecs_task_definition.this.arn : data.aws_ecs_service.this.task_definition
