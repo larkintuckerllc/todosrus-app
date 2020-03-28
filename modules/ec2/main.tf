@@ -81,7 +81,7 @@ resource "aws_lb_target_group" "this" {
   name        = "Legacy"
   port        = 80
   protocol    = "HTTP"
-  target_type = "ip"
+  target_type = "instance"
   vpc_id      = var.vpc_id
 }
 
@@ -108,3 +108,23 @@ resource "aws_route53_record" "this" {
   }
 }
 
+resource "aws_launch_template" "this" {
+  image_id = var.legacy_image_id
+  instance_type = "t3.micro"
+  key_name = var.legacy_key_name
+  name     = "Legacy"
+  vpc_security_group_ids = [aws_security_group.web.id]
+}
+
+resource "aws_autoscaling_group" "this" {
+  desired_capacity    = 3
+  launch_template {
+    id      = aws_launch_template.this.id
+    version = "$Latest"
+  }
+  max_size            = 3
+  min_size            = 3
+  name                = "Legacy"
+  target_group_arns   = [aws_lb_target_group.this.arn]
+  vpc_zone_identifier = data.aws_subnet_ids.private.ids
+}

@@ -18,6 +18,8 @@ variable "audience" { }
 variable "identity_provider_name" { }
 variable "issuer" { }
 variable "jwks" { }
+variable "legacy_image_id" { }
+variable "legacy_key_name" { }
 variable "task_change_flag" {
   default = false
 }
