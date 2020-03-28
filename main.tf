@@ -49,6 +49,11 @@ module "lambda_function_create_publish" {
   todos = aws_dynamodb_table.todos
 }
 
+module "ec2" {
+  source = "./modules/ec2"
+  vpc_id = data.terraform_remote_state.net.outputs.vpc_id
+}
+
 resource "aws_dynamodb_table" "todos" {
   attribute {
     name = "IdentityId"

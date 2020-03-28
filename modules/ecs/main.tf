@@ -255,7 +255,7 @@ EOF
 resource "aws_ecs_service" "this" {
     cluster               = aws_ecs_cluster.this.id
     depends_on            = [aws_lb_listener.this]
-  	desired_count         = 3
+  	desired_count         = 0
     launch_type           = "FARGATE"
     load_balancer {
       target_group_arn = aws_lb_target_group.this.arn
