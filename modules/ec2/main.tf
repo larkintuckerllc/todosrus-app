@@ -3,17 +3,17 @@ data "aws_acm_certificate" "this" {
 }
 
 data "aws_subnet_ids" "public" {
-  vpc_id = var.vpc_id
   tags = {
     Tier = "Public"
   }
+  vpc_id = var.vpc_id
 }
 
 data "aws_subnet_ids" "private" {
-  vpc_id = var.vpc_id
   tags = {
     Tier = "Private"
   }
+  vpc_id = var.vpc_id
 }
 
 data "aws_route53_zone" "this" {
@@ -27,34 +27,39 @@ resource "aws_security_group" "lb" {
 
 resource "aws_security_group" "web" {
   name   = "Legacy Web"
-  vpc_id      = var.vpc_id
+  vpc_id = var.vpc_id
+}
+
+resource "aws_security_group" "bastion" {
+  name   = "Bastion"
+  vpc_id = var.vpc_id
 }
 
 resource "aws_security_group_rule" "lb_ingress" {
-  type        = "ingress"
   cidr_blocks = ["0.0.0.0/0"]
   from_port   = 443
   protocol    = "tcp"
-  to_port     = 443
   security_group_id = aws_security_group.lb.id
+  to_port     = 443
+  type        = "ingress"
 }
 
 resource "aws_security_group_rule" "lb_egress" {
-  type        = "egress"
-  source_security_group_id = aws_security_group.web.id
   from_port   = 80
   protocol    = "tcp"
-  to_port     = 80
   security_group_id = aws_security_group.lb.id
+  source_security_group_id = aws_security_group.web.id
+  to_port     = 80
+  type        = "egress"
 }
 
 resource "aws_security_group_rule" "web_egress" {
-  type        = "egress"
   cidr_blocks = ["0.0.0.0/0"]
   from_port   = 0
   protocol    = "-1"
-  to_port     = 0
   security_group_id = aws_security_group.web.id
+  to_port     = 0
+  type        = "egress"
 }
 
 resource "aws_security_group_rule" "web_lb" {
@@ -64,6 +69,33 @@ resource "aws_security_group_rule" "web_lb" {
   protocol    = "tcp"
   to_port     = 80
   security_group_id = aws_security_group.web.id
+}
+
+resource "aws_security_group_rule" "web_bastion" {
+  type        = "ingress"
+  source_security_group_id = aws_security_group.bastion.id
+  from_port   = 22
+  protocol    = "tcp"
+  to_port     = 22
+  security_group_id = aws_security_group.web.id
+}
+
+resource "aws_security_group_rule" "bastion_ingress" {
+  cidr_blocks = ["0.0.0.0/0"]
+  from_port   = 22
+  protocol    = "tcp"
+  security_group_id = aws_security_group.bastion.id
+  to_port     = 22
+  type        = "ingress"
+}
+
+resource "aws_security_group_rule" "bastion_egress" {
+  cidr_blocks = ["0.0.0.0/0"]
+  from_port   = 0
+  protocol    = "-1"
+  security_group_id = aws_security_group.bastion.id
+  to_port     = 0
+  type        = "egress"
 }
 
 resource "aws_lb" "this" {
