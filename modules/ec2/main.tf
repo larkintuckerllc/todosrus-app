@@ -20,6 +20,22 @@ data "aws_route53_zone" "this" {
   name = "todosrus.com."
 }
 
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
+
 resource "aws_security_group" "lb" {
   name   = "Legacy LB"
   vpc_id = var.vpc_id
@@ -159,4 +175,15 @@ resource "aws_autoscaling_group" "this" {
   name                = "Legacy"
   target_group_arns   = [aws_lb_target_group.this.arn]
   vpc_zone_identifier = data.aws_subnet_ids.private.ids
+}
+
+resource "aws_instance" "this" {
+  ami                     = data.aws_ami.ubuntu.id
+  instance_type           = "t2.micro"
+  key_name                = var.legacy_key_name
+  subnet_id               = tolist(data.aws_subnet_ids.public.ids)[0]
+  vpc_security_group_ids = [aws_security_group.bastion.id]
+  tags = {
+    Name = "Bastion"
+  }
 }
