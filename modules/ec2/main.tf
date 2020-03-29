@@ -20,22 +20,6 @@ data "aws_route53_zone" "this" {
   name = "todosrus.com."
 }
 
-data "aws_ami" "ubuntu" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["099720109477"] # Canonical
-}
-
 resource "aws_security_group" "lb" {
   name   = "Legacy LB"
   vpc_id = var.vpc_id
@@ -43,11 +27,6 @@ resource "aws_security_group" "lb" {
 
 resource "aws_security_group" "web" {
   name   = "Legacy Web"
-  vpc_id = var.vpc_id
-}
-
-resource "aws_security_group" "bastion" {
-  name   = "Bastion"
   vpc_id = var.vpc_id
 }
 
@@ -89,29 +68,11 @@ resource "aws_security_group_rule" "web_lb" {
 
 resource "aws_security_group_rule" "web_bastion" {
   type        = "ingress"
-  source_security_group_id = aws_security_group.bastion.id
+  source_security_group_id = var.bastion_security_group_id 
   from_port   = 22
   protocol    = "tcp"
   to_port     = 22
   security_group_id = aws_security_group.web.id
-}
-
-resource "aws_security_group_rule" "bastion_ingress" {
-  cidr_blocks = ["0.0.0.0/0"]
-  from_port   = 22
-  protocol    = "tcp"
-  security_group_id = aws_security_group.bastion.id
-  to_port     = 22
-  type        = "ingress"
-}
-
-resource "aws_security_group_rule" "bastion_egress" {
-  cidr_blocks = ["0.0.0.0/0"]
-  from_port   = 0
-  protocol    = "-1"
-  security_group_id = aws_security_group.bastion.id
-  to_port     = 0
-  type        = "egress"
 }
 
 resource "aws_lb" "this" {
@@ -175,15 +136,4 @@ resource "aws_autoscaling_group" "this" {
   name                = "Legacy"
   target_group_arns   = [aws_lb_target_group.this.arn]
   vpc_zone_identifier = data.aws_subnet_ids.private.ids
-}
-
-resource "aws_instance" "this" {
-  ami                     = data.aws_ami.ubuntu.id
-  instance_type           = "t2.micro"
-  key_name                = var.legacy_key_name
-  subnet_id               = tolist(data.aws_subnet_ids.public.ids)[0]
-  vpc_security_group_ids = [aws_security_group.bastion.id]
-  tags = {
-    Name = "Bastion"
-  }
 }

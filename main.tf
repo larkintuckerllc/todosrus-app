@@ -40,6 +40,12 @@ module "ecs" {
   vpc_id = data.terraform_remote_state.net.outputs.vpc_id
 }
 
+module "bastion" {
+  source = "./modules/bastion"
+  legacy_key_name = var.legacy_key_name
+  vpc_id = data.terraform_remote_state.net.outputs.vpc_id
+}
+
 module "lambda_function_create_publish" {
   source = "./modules/lambda-todos-create-publish"
   aws_region_id = data.aws_region.this.id
@@ -51,6 +57,7 @@ module "lambda_function_create_publish" {
 
 module "ec2" {
   source = "./modules/ec2"
+  bastion_security_group_id = module.bastion.bastion_security_group_id
   legacy_image_id = var.legacy_image_id
   legacy_key_name = var.legacy_key_name
   vpc_id = data.terraform_remote_state.net.outputs.vpc_id
