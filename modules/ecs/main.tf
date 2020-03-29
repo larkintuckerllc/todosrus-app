@@ -255,7 +255,7 @@ EOF
 resource "aws_ecs_service" "this" {
     cluster               = aws_ecs_cluster.this.id
     depends_on            = [aws_lb_listener.this]
-  	desired_count         = 0
+  	desired_count         = 1
     launch_type           = "FARGATE"
     load_balancer {
       target_group_arn = aws_lb_target_group.this.arn
@@ -264,7 +264,6 @@ resource "aws_ecs_service" "this" {
     }
     name                  = "todosrus"
     network_configuration {
-      assign_public_ip    = true
       security_groups     = [aws_security_group.web.id]
       subnets             = data.aws_subnet_ids.private.ids
     }
