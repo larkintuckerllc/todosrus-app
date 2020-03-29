@@ -1,7 +1,3 @@
-data "aws_acm_certificate" "this" {
-  domain  = "legacy.todosrus.com"
-}
-
 data "aws_subnet_ids" "public" {
   tags = {
     Tier = "Public"
