@@ -67,8 +67,8 @@ resource "aws_security_group_rule" "web_lb" {
 }
 
 resource "aws_security_group_rule" "web_bastion" {
+  cidr_blocks = ["0.0.0.0/0"]
   type        = "ingress"
-  source_security_group_id = var.bastion_security_group_id 
   from_port   = 22
   protocol    = "tcp"
   to_port     = 22
