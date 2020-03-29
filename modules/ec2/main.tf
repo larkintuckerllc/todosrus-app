@@ -121,6 +121,9 @@ resource "aws_launch_template" "this" {
   image_id = var.legacy_image_id
   instance_type = "t3.micro"
   key_name = var.legacy_key_name
+  lifecycle {
+    ignore_changes = [key_name, image_id] # ISSUE: key_name NOT IN STATE
+  }
   name     = "Legacy"
   vpc_security_group_ids = [aws_security_group.web.id]
 }

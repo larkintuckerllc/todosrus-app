@@ -50,6 +50,22 @@ resource "aws_instance" "this" {
   key_name                = var.legacy_key_name
   subnet_id               = tolist(data.aws_subnet_ids.public.ids)[0]
   vpc_security_group_ids = [aws_security_group.bastion.id]
+  user_data              = <<-EOT
+#!/bin/bash
+cat << EOF > /tmp/99-warn
+#!/bin/bash
+
+echo
+echo " __      __                     .__                "
+echo "/  \\\\    /  \\\\_____ _______  ____ |__| ____    ____  "
+echo "\\\\   \\\\/\\\\/   /\\\\__  \\\\\\\\_  __ \\\\/    \\\\|  |/    \\\\  / ___\\\\ "
+echo " \\\\        /  / __ \\\\|  | \\\\/   |  \\\\  |   |  \\\\/ /_/  >"
+echo "  \\\\__/\\\\  /  (____  /__|  |___|  /__|___|  /\\\\___  / "
+echo "       \\\\/        \\\\/           \\\\/        \\\\//_____/  "
+EOF
+sudo cp /tmp/99-warn /etc/update-motd.d/99-warn
+sudo chmod 755 /etc/update-motd.d/99-warn
+  EOT
   tags = {
     Name = "Bastion"
   }
