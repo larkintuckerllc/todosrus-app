@@ -136,7 +136,7 @@ resource "aws_autoscaling_group" "this" {
   }
   max_size            = 1
   min_size            = 1
-  name_prefix         = "Legacy-${aws_launch_template.this.latest_version}"
+  name_prefix         = "Legacy-${aws_launch_template.this.latest_version}-"
   target_group_arns   = [aws_lb_target_group.this.arn]
   vpc_zone_identifier = data.aws_subnet_ids.private.ids
 }
