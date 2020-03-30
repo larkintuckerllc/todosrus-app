@@ -10,16 +10,14 @@
 # CodeBuild: frontend-postbuild
 # CodePipeline: frontend
 
-# Cognito: Identity Pool: customers
-variable "identity_pool_id" { }
-
-# Cogntio: User Pool: customers
-variable "audience" { }
-variable "identity_provider_name" { }
-variable "issuer" { }
-variable "jwks" { }
-variable "legacy_image_id" { }
-variable "legacy_key_name" { }
+variable "audience" { } # Cognito: User Pool: customers
+variable "bastion_security_group_id" { } # CloudFormation: Linux-bastion
+variable "identity_pool_id" { } # Cognito: Identity Pool: customers
+variable "identity_provider_name" { } # Cognito: User Pool: customers
+variable "issuer" { } # Cognito: User Pool: customers
+variable "jwks" { } # Cognito: User Pool: customers
+variable "legacy_image_id" { } # Packer
+variable "legacy_key_name" { } # Packer
 variable "task_change_flag" {
   default = false
 }

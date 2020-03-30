@@ -59,20 +59,20 @@ resource "aws_security_group_rule" "web_egress" {
 
 resource "aws_security_group_rule" "web_lb" {
   type        = "ingress"
-  source_security_group_id = aws_security_group.lb.id
   from_port   = 80
   protocol    = "tcp"
   to_port     = 80
   security_group_id = aws_security_group.web.id
+  source_security_group_id = aws_security_group.lb.id
 }
 
 resource "aws_security_group_rule" "web_bastion" {
-  cidr_blocks = ["0.0.0.0/0"]
   type        = "ingress"
   from_port   = 22
   protocol    = "tcp"
   to_port     = 22
   security_group_id = aws_security_group.web.id
+  source_security_group_id = var.bastion_security_group_id
 }
 
 resource "aws_lb" "this" {
@@ -129,13 +129,13 @@ resource "aws_launch_template" "this" {
 }
 
 resource "aws_autoscaling_group" "this" {
-  desired_capacity    = 3
+  desired_capacity    = 1 
   launch_template {
     id      = aws_launch_template.this.id
     version = "$Latest"
   }
-  max_size            = 3
-  min_size            = 3
+  max_size            = 1
+  min_size            = 1
   name                = "Legacy"
   target_group_arns   = [aws_lb_target_group.this.arn]
   vpc_zone_identifier = data.aws_subnet_ids.private.ids
