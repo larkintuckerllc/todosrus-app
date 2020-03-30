@@ -122,7 +122,7 @@ resource "aws_launch_template" "this" {
   instance_type = "t3.micro"
   key_name = var.legacy_key_name
   lifecycle {
-    ignore_changes = [key_name, image_id] # ISSUE: key_name NOT IN STATE
+    ignore_changes = [key_name] # ISSUE: key_name NOT IN STATE
   }
   name     = "Legacy"
   vpc_security_group_ids = [aws_security_group.web.id]
@@ -136,7 +136,7 @@ resource "aws_autoscaling_group" "this" {
   }
   max_size            = 1
   min_size            = 1
-  name                = "Legacy"
+  name_prefix         = "Legacy-${aws_launch_template.this.latest_version}"
   target_group_arns   = [aws_lb_target_group.this.arn]
   vpc_zone_identifier = data.aws_subnet_ids.private.ids
 }
