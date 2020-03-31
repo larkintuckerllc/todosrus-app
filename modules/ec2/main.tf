@@ -159,6 +159,51 @@ resource "aws_iam_role_policy_attachment" "legacy_ec2_cloud_watch_agent_server_p
   role       = aws_iam_role.legacy_ec2.name
 }
 
+resource "aws_iam_role_policy" "legacy_ec2_s3_read_system_manager_run_command_ansible" {
+    name   = "S3ReadSystemsManagerRunCommandAnsible"
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::systems-manager-run-command-ansible/*",
+                "arn:aws:s3:::systems-manager-run-command-ansible"
+            ]
+        }
+    ]
+}
+EOF
+    role   = aws_iam_role.legacy_ec2.id
+}
+
+resource "aws_iam_role_policy" "legacy_ec2_s3_write_legacy_upgrade_output" {
+    name   = "S3WriteLegacyUpgradeOutput"
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject"
+            ],
+            "Resource": "arn:aws:s3:::legacy-upgrade-output/*"
+        }
+    ]
+}
+EOF
+    role   = aws_iam_role.legacy_ec2.id
+}
+
 resource "aws_launch_template" "this" {
   iam_instance_profile {
     name = aws_iam_instance_profile.legacy_ec2.name
@@ -167,6 +212,12 @@ resource "aws_launch_template" "this" {
   instance_type          = "t3.micro"
   key_name               = var.legacy_key_name
   name                   = "Legacy"
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "Legacy"
+    }
+  }
   vpc_security_group_ids = [aws_security_group.web.id]
 }
 
