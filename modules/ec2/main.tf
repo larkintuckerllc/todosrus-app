@@ -20,6 +20,14 @@ data "aws_route53_zone" "this" {
   name = "todosrus.com."
 }
 
+data "aws_iam_policy" "amazon_ssm_managed_instance_core" {
+  arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+data "aws_iam_policy" "cloud_watch_agent_server_policy" {
+  arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
 resource "aws_security_group" "lb" {
   name   = "Legacy LB"
   vpc_id = var.vpc_id
@@ -117,11 +125,48 @@ resource "aws_route53_record" "this" {
   }
 }
 
+resource "aws_iam_role" "legacy_ec2" {
+  assume_role_policy = <<EOF
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+  name               = "LegacyEC2"
+}
+
+resource "aws_iam_instance_profile" "legacy_ec2" {
+  name = "LegacyEC2"
+  role = aws_iam_role.legacy_ec2.name
+}
+
+resource "aws_iam_role_policy_attachment" "legacy_ec2_amazon_ssm_managed_instance_core" {
+  policy_arn = data.aws_iam_policy.amazon_ssm_managed_instance_core.arn
+  role       = aws_iam_role.legacy_ec2.name
+}
+
+resource "aws_iam_role_policy_attachment" "legacy_ec2_cloud_watch_agent_server_policy" {
+  policy_arn = data.aws_iam_policy.cloud_watch_agent_server_policy.arn
+  role       = aws_iam_role.legacy_ec2.name
+}
+
 resource "aws_launch_template" "this" {
-  image_id = var.legacy_image_id
-  instance_type = "t3.micro"
-  key_name = var.legacy_key_name
-  name     = "Legacy"
+  iam_instance_profile {
+    name = aws_iam_instance_profile.legacy_ec2.name
+  }
+  image_id               = var.legacy_image_id
+  instance_type          = "t3.micro"
+  key_name               = var.legacy_key_name
+  name                   = "Legacy"
   vpc_security_group_ids = [aws_security_group.web.id]
 }
 
